@@ -15,11 +15,23 @@ function Button({ children, disabled, to, type, clickHandler }) {
     return (
       <Link
         to={to}
-        className={styles[type]}  
+        className={styles[type]}
       >
         {children}
       </Link>
     );
+
+  if (clickHandler) {
+    return (
+      <button
+        className={styles[type]}
+        disabled={disabled}
+        onClick={clickHandler}
+      >
+        {children}
+      </button>
+    );
+  }
 
   return (
     <button
