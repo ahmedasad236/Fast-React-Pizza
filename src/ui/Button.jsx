@@ -15,7 +15,7 @@ function Button({ children, disabled, to, type, clickHandler }) {
     return (
       <Link
         to={to}
-        className={styles[type]}
+        className={styles[type]}  
       >
         {children}
       </Link>
