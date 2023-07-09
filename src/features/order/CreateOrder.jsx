@@ -2,11 +2,13 @@ import { Form, redirect, useActionData, useNavigation } from 'react-router-dom';
 import { createOrder } from '../../services/apiRestaurant';
 import Button from '../../ui/Button';
 import EmptyCart from '../cart/EmptyCart';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { clearCart, getCart, getTotalCartPrice } from '../cart/cartSlice';
 import store from '../../store';
 import { formatCurrency } from '../../utils/helpers';
 import { useState } from 'react';
+import { fetchAddress } from '../user/userSlice';
+
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
   /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/.test(
@@ -17,13 +19,26 @@ function CreateOrder() {
   const [withPriority, setWithPriority] = useState(false);
   const username = useSelector((store) => store.user.username);
   const totalCartPrice = useSelector(getTotalCartPrice);
+  const {
+    status: addressStatus,
+    address,
+    position,
+    error: errorAddress
+  } = useSelector((state) => state.user);
+
+  const isLoadingAddress = addressStatus === 'loading';
   const priorityPrice = withPriority ? totalCartPrice * 0.2 : 0;
   const totalPrice = priorityPrice + totalCartPrice;
   const navigation = useNavigation();
   const formErrors = useActionData();
+  const dispatch = useDispatch();
   const isSubmitting = navigation.state === 'submitting';
   const cart = useSelector(getCart);
 
+  function getUserAddresHandler(e) {
+    e.preventDefault();
+    dispatch(fetchAddress());
+  }
   if (!cart.length) return <EmptyCart />;
 
   return (
@@ -32,7 +47,7 @@ function CreateOrder() {
 
       <Form method="POST">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
-          <label className="basis-40">First Name</label>
+          <label className="sm:basis-40">First Name</label>
           <input
             className="input grow"
             type="text"
@@ -43,7 +58,7 @@ function CreateOrder() {
         </div>
 
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
-          <label className="basis-40">Phone number</label>
+          <label className="sm:basis-40">Phone number</label>
           <div className="grow">
             <input
               className="input w-full"
@@ -59,22 +74,49 @@ function CreateOrder() {
           </div>
         </div>
 
-        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
-          <label className="basis-40">Address</label>
+        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center relative">
+          <label className="sm:basis-40">Address</label>
           <div className="grow">
             <input
               className="input w-full"
               type="text"
               name="address"
+              disabled={isLoadingAddress}
+              defaultValue={address}
               required
             />
+            {addressStatus === 'error' && (
+              <p className="text-xs mt-2 text-red-700 bg-red-200 p-2 rounded-md">
+                {errorAddress}
+              </p>
+            )}
           </div>
+          {!position.latitude && !position.longitude && (
+            <span className="absolute right-[3px] top-[32px]  md:top-[2px] z-10">
+              <Button
+                type="small"
+                clickHandler={getUserAddresHandler}
+                disabled={isLoadingAddress}
+              >
+                Get your position
+              </Button>
+            </span>
+          )}
         </div>
 
         <input
           type="hidden"
           name="cart"
           value={JSON.stringify(cart)}
+        />
+        <input
+          type="hidden"
+          name="position"
+          value={
+            position.longitude && position.latitude
+              ? `${position.latitude}, ${position.longitude}`
+              : ''
+          }
         />
         <div className="mb-12 flex gap-5 items-center">
           <input
@@ -96,9 +138,9 @@ function CreateOrder() {
         <div>
           <Button
             type="primary"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isLoadingAddress}
           >
-            {isSubmitting
+            {isSubmitting || isLoadingAddress
               ? 'Placing order...'
               : `Order now from ${formatCurrency(totalPrice)}`}
           </Button>
