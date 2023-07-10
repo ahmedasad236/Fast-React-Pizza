@@ -32,8 +32,8 @@ function CreateOrder() {
   const navigation = useNavigation();
   const formErrors = useActionData();
   const dispatch = useDispatch();
-  const isSubmitting = navigation.state === 'submitting';
   const cart = useSelector(getCart);
+  const isSubmitting = navigation.state === 'submitting';
 
   function getUserAddresHandler(e) {
     e.preventDefault();
