@@ -86,7 +86,7 @@ $ npm run dev
 ## usecases
 
 **Watch on Youtube**
-[![WorldWise](https://img.youtube.com/vi/dMjb4E_M6BM/0.jpg)](https://www.youtube.com/watch?v=dMjb4E_M6BM?autoplay=1&rel=0)
+[![Fast-React-Pizza](https://img.youtube.com/vi/nKz47kAQwcA/0.jpg)](https://www.youtube.com/watch?v=nKz47kAQwcA?autoplay=1&rel=0)
 
 ## ✍️ Contributors
 
@@ -106,4 +106,4 @@ $ npm run dev
 ## Credits
 
 This project was developed by <a href="https://github.com/ahmedasad236" target="_black">
-Ahmed Asaad</a> during The react course of Mr.Jonas schmidtman.
+Ahmed Asaad</a> during The react course of Mr.Jonas schmedttman.
